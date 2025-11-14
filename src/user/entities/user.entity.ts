@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity('user')
@@ -40,4 +41,12 @@ export class User {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at: Date;
+
+  // @Index({ unique: true })
+  // @Column({ nullable: true })
+  // googleId: string;
+
+  // @Index({ unique: true })
+  // @Column({ nullable: true })
+  // appleSub: string;
 }

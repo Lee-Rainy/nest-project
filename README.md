@@ -1,98 +1,56 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Nest Project — 功能批注
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+简要说明：这是一个基于 NestJS 的后端服务模版，集成了认证、用户管理、图片验证码、Redis、TypeORM 和（占位）聊天模块，便于快速开发与扩展。
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+快速启动
+- 安装依赖：参见 [package.json](package.json) 的 scripts。
+  - 本地开发：npm run start:dev
+  - 打包运行：npm run build && npm run start:prod
 
-## Description
+核心模块与功能（按文件/符号对应）
+- 应用入口 / 模块装配  
+  - [`AppModule`](src/app.module.ts) — 主模块，加载各子模块并配置 TypeORM（MySQL）和全局 Config。[src/app.module.ts](src/app.module.ts)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- 认证（Auth）  
+  - [`AuthModule`](src/auth/auth.module.ts) — 登录/刷新 token、用户信息等 API 集合。[src/auth/auth.module.ts](src/auth/auth.module.ts)  
+  - 相关控制器/服务：[`AuthController`](src/auth/auth.controller.ts) / [`AuthService`](src/auth/auth.service.ts)（处理登录、验证码校验、token 签发）。[src/auth/auth.controller.ts](src/auth/auth.controller.ts) [src/auth/auth.service.ts](src/auth/auth.service.ts)  
+  - JWT 策略：[`jwt.strategy.ts`](src/auth/jwt.strategy.ts)（验证 token）。[src/auth/jwt.strategy.ts](src/auth/jwt.strategy.ts)
 
-## Project setup
+- 用户（User）
+  - [`UserModule`](src/user/user.module.ts) & [`UserService`](src/user/user.service.ts) — 注册、查询、更新用户接口（目前 service 有示例内存数据和未实现的 DB 操作占位）。[src/user/user.module.ts](src/user/user.module.ts) [src/user/user.service.ts](src/user/user.service.ts)
 
-```bash
-$ pnpm install
-```
+- 验证码（Captcha）
+  - [`CaptchaModule`](src/captcha/captcha.module.ts) / [`CaptchaService`](src/captcha/captcha.service.ts) / [`CaptchaController`](src/captcha/captcha.controller.ts) — 生成 SVG 验证码并在 Redis 中短期保存用于校验；代码使用了 [`svg-captcha`](pnpm-lock.yaml#L3192) 和 Redis 客户端。[src/captcha/captcha.service.ts](src/captcha/captcha.service.ts) [src/captcha/captcha.controller.ts](src/captcha/captcha.controller.ts)
 
-## Compile and run the project
+- Redis 全局客户端
+  - [`RedisModule`](src/redis/redis.module.ts) — 全局注入 ioredis 客户端，供验证码与其他缓存使用。[src/redis/redis.module.ts](src/redis/redis.module.ts)
 
-```bash
-# development
-$ pnpm run start
+- TypeORM / 数据迁移
+  - 通过 TypeORM 连接 MySQL（配置在 [`AppModule`](src/app.module.ts) 中）。[src/app.module.ts](src/app.module.ts)  
+  - 示例迁移：[`CreateUserTable1695299999999`](src/migrations/CreateUserTable.ts) — 用户表结构定义（含 uuid、username、password_hash 等字段）。[src/migrations/CreateUserTable.ts](src/migrations/CreateUserTable.ts)
 
-# watch mode
-$ pnpm run start:dev
+- 聊天（Chat）模块（占位）
+  - [`ChatModule`](src/chat/chat.module.ts) 目前只有模块声明，需补充控制器与服务以实现消息发送/接收、持久化或 WebSocket 支持。[src/chat/chat.module.ts](src/chat/chat.module.ts)
 
-# production mode
-$ pnpm run start:prod
-```
+开发与改进建议（优先级）
+- 安全（高）
+  - 将 JWT secret、数据库与 Redis 凭证移入环境变量（ConfigModule 已启用）。[src/app.module.ts](src/app.module.ts) [package.json](package.json)
+  - 使用 bcrypt 或更强哈希替代明文/不安全的密码处理（参考 `bcrypt` 依赖已列在 lockfile）。[src/user/user.service.ts](src/user/user.service.ts)
+- 功能（中）
+  - 完善 [`ChatModule`](src/chat/chat.module.ts)：增加 WebSocket 支持、ChatService、ChatController 与消息存储。 [src/chat/chat.module.ts](src/chat/chat.module.ts)
+  - 将 UserService 中的内存示例替换为真实的 Repository 操作（使用注入的 TypeORM Repository）。[src/user/user.service.ts](src/user/user.service.ts)
+- 质量（中）
+  - 补充单元测试（test/ 与各模块的 *.spec.ts 已存在占位）。
+  - 完善错误处理与返回规范。
 
-## Run tests
+依赖与兼容性
+- 依赖管理使用 pnpm，详细版本记录见 [pnpm-lock.yaml](pnpm-lock.yaml)（示例：`svg-captcha@1.4.0`、`ioredis@5.8.0`、`@nestjs/*` 等）。[pnpm-lock.yaml](pnpm-lock.yaml)
 
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+文件快速入口
+- 主入口：[src/main.ts](src/main.ts)
+- 主模块：[src/app.module.ts](src/app.module.ts)
+- 认证：[src/auth/auth.controller.ts](src/auth/auth.controller.ts)
+- 用户：[src/user/user.service.ts](src/user/user.service.ts)
+- 验证码：[src/captcha/captcha.service.ts](src/captcha/captcha.service.ts)
+- Redis 注入：[src/redis/redis.module.ts](src/redis/redis.module.ts)
+- 聊天模块占位：[src/chat/chat.module.ts](src/chat/chat.module.ts)

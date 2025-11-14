@@ -4,6 +4,7 @@ import session from 'express-session';
 import { ResponseInterceptor } from './common/interceptors/response/response.interceptor';
 import { JwtGuard } from './auth/jwt.guard';
 import { ValidationPipe } from '@nestjs/common';
+import 'global-agent/bootstrap';
 // somewhere in your initialization file
 
 async function bootstrap() {

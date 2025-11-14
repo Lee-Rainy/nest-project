@@ -67,11 +67,24 @@ export class UserService {
 
   findAll() {
     return this.users.map((user) => ({ name: user.username }));
-    return `This action returns all user`;
   }
 
-  findOne(name: string) {
-    return this.users.find((user) => user.username === name);
+  async findOne(username: string) {
+    const user = await this.userRepo.findOne({ where: { username } });
+    if (!user) throw new BadRequestException('该用户不存在');
+    return user;
+  }
+
+  async validateUser(username: string, pwd: string) {
+    const user = await this.userRepo.findOne({ where: { username } });
+    if (!user) throw new BadRequestException('该用户不存在');
+
+    const isMatch = await bcrypt.compare(pwd, user.password_hash);
+    if (!isMatch) {
+      throw new BadRequestException('密码错误');
+    }
+
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

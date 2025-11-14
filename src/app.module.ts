@@ -9,6 +9,7 @@ import { CaptchaModule } from './captcha/captcha.module';
 import { RedisModule } from './redis/redis.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         synchronize: true,
       }),
     }),
+    ChatModule,
   ],
   controllers: [AppController, CaptchaController],
   providers: [AppService, CaptchaService],
